@@ -184,11 +184,11 @@ class TransactionService {
                 [newBalance, user_id]
             );
             
-            // 6. Create transaction record with SUCCESS status
+            // 6. Create transaction record with PENDING status
             const [result] = await connection.query(
                 `INSERT INTO transactions 
                  (user_id, product_id, customer_number, amount, status, reference_number) 
-                 VALUES (?, ?, ?, ?, 'SUCCESS', ?)`,
+                 VALUES (?, ?, ?, ?, 'PENDING', ?)`,
                 [user_id, product_id, customer_number, amount, referenceNumber]
             );
             

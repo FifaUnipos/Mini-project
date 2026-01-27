@@ -72,7 +72,7 @@ class CategoryService {
      * @returns {array} Categories list
      */
     async getCategories(options = {}) {
-        const { parent_id = null, is_active = null, flat = false, search = '', sortBy = 'c.name', sortDir = 'ASC' } = options;
+        const { parent_id = null, is_active = null, flat = false, search = '', sortBy = 'c.name', sortDir = 'ASC', description = null } = options;
         let query = `
             SELECT 
                 c.id, 
@@ -103,6 +103,10 @@ class CategoryService {
         if (search) {
             query += ' AND c.name LIKE ?';
             values.push(`%${search}%`);
+        }
+        if (description) {
+            query += ' AND c.description LIKE ?';
+            values.push(`%${description}%`);
         }
         query += ` ORDER BY ${sortBy} ${sortDir}`;
         const [rows] = await pool.query(query, values);

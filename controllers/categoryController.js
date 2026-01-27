@@ -46,7 +46,8 @@ class CategoryController {
                 flat: req.query.flat === 'true',
                 search: req.query.search || '',
                 sortBy: req.query.sortBy || 'c.name',
-                sortDir: req.query.sortDir || 'ASC'
+                sortDir: req.query.sortDir || 'ASC',
+                description: req.query.description || null
             };
             const categories = await categoryService.getCategories(options);
             return successResponse(res, categories, 'Daftar category berhasil diambil');

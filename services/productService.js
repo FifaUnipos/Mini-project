@@ -51,37 +51,41 @@ class ProductService {
             is_active = null,
             search = null,
             sortBy = 'p.created_at',
-            sortDir = 'DESC'
+            sortDir = 'DESC',
+            price_min = null,
+            price_max = null
         } = options;
         const offset = (page - 1) * limit;
         // Build where clause
         const conditions = [];
         const values = [];
-        
         if (type) {
             conditions.push('p.type = ?');
             values.push(type);
         }
-        
         if (category_id) {
             conditions.push('p.category_id = ?');
             values.push(category_id);
         }
-        
         if (is_active !== null) {
             conditions.push('p.is_active = ?');
             values.push(is_active === 'true' || is_active === true ? 1 : 0);
         }
-        
         if (search) {
             conditions.push('(p.name LIKE ? OR p.description LIKE ?)');
             values.push(`%${search}%`, `%${search}%`);
         }
-        
+        if (price_min !== null) {
+            conditions.push('p.price >= ?');
+            values.push(price_min);
+        }
+        if (price_max !== null) {
+            conditions.push('p.price <= ?');
+            values.push(price_max);
+        }
         const whereClause = conditions.length > 0 
             ? 'WHERE ' + conditions.join(' AND ') 
             : '';
-        
         // Get total count
         const [countResult] = await pool.query(
             `SELECT COUNT(*) as total FROM products p ${whereClause}`,
@@ -89,7 +93,6 @@ class ProductService {
         );
         const totalItems = countResult[0].total;
         const totalPages = Math.ceil(totalItems / limit);
-        
         // Get products with category info
         const [rows] = await pool.query(
             `SELECT p.id, p.name, p.category_id, c.name as category_name, p.type, p.price, p.description, p.is_active, p.created_at, p.updated_at 
@@ -100,7 +103,6 @@ class ProductService {
              LIMIT ? OFFSET ?`,
             [...values, limit, offset]
         );
-        
         return {
             data: rows,
             pagination: {

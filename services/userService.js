@@ -27,11 +27,15 @@ class UserService {
             error.status = 409;
             throw error;
         }
-        // Create user with default balance = 0
-        const [result] = await pool.query(
-            'INSERT INTO users (name, email, phone_number, balance) VALUES (?, ?, ?, 0)',
-            [fixedName, email, phone_number || null]
-        );
+            // Format phone number: replace leading 0 with +62
+            if (phone_number && typeof phone_number === 'string') {
+                userData.phone_number = phone_number.replace(/^0/, '+62');
+            }
+            // Create user with default balance = 0
+            const [result] = await pool.query(
+                'INSERT INTO users (name, email, phone_number, balance) VALUES (?, ?, ?, 0)',
+                [fixedName, email, userData.phone_number || null]
+            );
         return this.getUserById(result.insertId);
     }
 
@@ -47,10 +51,14 @@ class UserService {
             updates.push('email = ?');
             values.push(email);
         }
-        if (phone_number !== undefined) {
-            updates.push('phone_number = ?');
-            values.push(phone_number);
-        }
+            // Format phone number: replace leading 0 with +62
+            if (phone_number && typeof phone_number === 'string') {
+                userData.phone_number = phone_number.replace(/^0/, '+62');
+            }
+            if (userData.phone_number !== undefined) {
+                updates.push('phone_number = ?');
+                values.push(userData.phone_number);
+            }
         if (updates.length > 0) {
             values.push(id);
             await pool.query(
@@ -67,23 +75,40 @@ class UserService {
      * @param {number} limit - Items per page
      * @returns {object} Users list with pagination info
      */
-    async getUsers(page = 1, limit = 10, search = '', sortBy = 'created_at', sortDir = 'DESC') {
+    async getUsers(page = 1, limit = 10, search = '', sortBy = 'created_at', sortDir = 'DESC', filters = {}) {
         const offset = (page - 1) * limit;
-        let where = '';
+        let where = [];
         let values = [];
         if (search) {
-            where = 'WHERE name LIKE ?';
+            where.push('name LIKE ?');
             values.push(`%${search}%`);
         }
+        if (filters.email) {
+            where.push('email LIKE ?');
+            values.push(`%${filters.email}%`);
+        }
+        if (filters.phone_number) {
+            where.push('phone_number LIKE ?');
+            values.push(`%${filters.phone_number}%`);
+        }
+        if (filters.balance_min !== undefined) {
+            where.push('balance >= ?');
+            values.push(filters.balance_min);
+        }
+        if (filters.balance_max !== undefined) {
+            where.push('balance <= ?');
+            values.push(filters.balance_max);
+        }
+        const whereClause = where.length > 0 ? 'WHERE ' + where.join(' AND ') : '';
         // Get total count
-        const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM users ${where}`, values);
+        const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM users ${whereClause}`, values);
         const totalItems = countResult[0].total;
         const totalPages = Math.ceil(totalItems / limit);
         // Get users
         const [rows] = await pool.query(
             `SELECT id, name, email, phone_number, balance, created_at, updated_at 
              FROM users 
-             ${where}
+             ${whereClause}
              ORDER BY ${sortBy} ${sortDir} 
              LIMIT ? OFFSET ?`,
             [...values, limit, offset]

@@ -50,7 +50,9 @@ class ProductController {
                 is_active: req.query.is_active !== undefined ? req.query.is_active : null,
                 search: req.query.search || null,
                 sortBy: req.query.sortBy || 'p.created_at',
-                sortDir: req.query.sortDir || 'DESC'
+                sortDir: req.query.sortDir || 'DESC',
+                price_min: req.query.price_min || null,
+                price_max: req.query.price_max || null
             };
             const result = await productService.getProducts(options);
             return paginatedResponse(

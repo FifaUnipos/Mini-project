@@ -47,7 +47,13 @@ class UserController {
             const search = req.query.search || '';
             const sortBy = req.query.sortBy || 'created_at';
             const sortDir = req.query.sortDir || 'DESC';
-            const result = await userService.getUsers(page, limit, search, sortBy, sortDir);
+            const filters = {
+                email: req.query.email,
+                phone_number: req.query.phone_number,
+                balance_min: req.query.balance_min,
+                balance_max: req.query.balance_max
+            };
+            const result = await userService.getUsers(page, limit, search, sortBy, sortDir, filters);
             return paginatedResponse(
                 res, 
                 result.data, 
