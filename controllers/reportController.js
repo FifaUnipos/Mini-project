@@ -13,6 +13,7 @@ const {
 } = require('../utils/respons');
 
 class ReportController {
+        // handleError removed (reverting to original error handling)
     /**
      * Get user transaction summary
      * GET /api/reports/users
@@ -30,8 +31,7 @@ class ReportController {
             return errorResponse(
                 res,
                 error && error.message ? error.message : 'Terjadi kesalahan',
-                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
-                error && error.details ? error.details : null
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -53,8 +53,9 @@ class ReportController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error
             );
         }
     }

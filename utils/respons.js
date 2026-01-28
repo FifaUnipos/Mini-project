@@ -101,11 +101,9 @@ const errorResponse = (res, message = 'An error occurred', statusCode = HTTP_STA
         message: message,
         timestamp: new Date().toISOString()
     };
-
     if (errors) {
         response.errors = errors;
     }
-    
     return res.status(statusCode).json(response);
 };
 

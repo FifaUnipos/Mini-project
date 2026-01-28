@@ -12,6 +12,7 @@ const {
 } = require('../utils/respons');
 
 class CategoryController {
+        // handleError removed (reverting to original error handling)
     /**
      * Create new category
      * POST /api/categories
@@ -26,7 +27,6 @@ class CategoryController {
                 HTTP_STATUS.CREATED
             );
         } catch (error) {
-            // Map pesan error ke status code spesifik jika error.status tidak ada
             let status = error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR;
             if (!error.status && error && error.message) {
                 if (error.message.toLowerCase().includes('not found') || error.message.toLowerCase().includes('tidak ditemukan')) {
@@ -41,7 +41,7 @@ class CategoryController {
                 res,
                 error && error.message ? error.message : 'Terjadi kesalahan',
                 status,
-                error && error.details ? error.details : null
+                error && error.details ? error.details : error
             );
         }
     }
@@ -66,8 +66,9 @@ class CategoryController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -84,7 +85,8 @@ class CategoryController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -118,7 +120,8 @@ class CategoryController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -132,7 +135,8 @@ class CategoryController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -152,7 +156,8 @@ class CategoryController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }

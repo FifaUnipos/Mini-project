@@ -3,6 +3,7 @@
  * Handles HTTP requests untuk product endpoints
  */
 
+const e = require('cors');
 const productService = require('../services/productService');
 const { 
     successResponse, 
@@ -14,6 +15,7 @@ const {
 } = require('../utils/respons');
 
 class ProductController {
+        // handleError removed (reverting to original error handling)
     /**
      * Create new product
      * POST /api/products
@@ -32,7 +34,8 @@ class ProductController {
                 res,
                 error && error.message ? error.message : 'Terjadi kesalahan',
                 error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
-                error && error.details ? error.details : null
+                error && error.details ? error.details : null,
+                error
             );
         }
     }
@@ -65,8 +68,8 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR
             );
         }
     }
@@ -82,8 +85,10 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error,
+                error
             );
         }
     }
@@ -102,8 +107,10 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error,
+                error
             );
         }
     }
@@ -123,8 +130,10 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error,
+                error
             );
         }
     }
@@ -140,8 +149,10 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error,
+                error
             );
         }
     }
@@ -160,8 +171,10 @@ class ProductController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : error,
+                error
             );
         }
     }

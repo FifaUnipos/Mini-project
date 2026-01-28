@@ -32,10 +32,14 @@ class UserController {
                 res,
                 error && error.message ? error.message : 'Terjadi kesalahan',
                 error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
-                error && error.details ? error.details : null
+                error
             );
         }
     }
+    /**
+     * Utility: Handle error response with detail and status
+     */
+    // handleError removed (reverting to original error handling)
 
     /**
      * Get all users with pagination
@@ -64,8 +68,10 @@ class UserController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error && error.details ? error.details : null,
+                error
             );
         }
     }
@@ -81,8 +87,9 @@ class UserController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error 
             );
         }
     }
@@ -101,8 +108,9 @@ class UserController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error 
             );
         }
     }
@@ -122,8 +130,9 @@ class UserController {
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error 
             );
         }
     }
@@ -135,7 +144,6 @@ class UserController {
     async topUpBalance(req, res) {
         try {
             const { amount } = req.body;
-            
             if (!amount || amount <= 0) {
                 return errorResponse(
                     res, 
@@ -143,18 +151,17 @@ class UserController {
                     HTTP_STATUS.BAD_REQUEST
                 );
             }
-            
             const user = await userService.addBalance(
                 parseInt(req.params.id), 
                 parseFloat(amount)
             );
-            
             return successResponse(res, user, 'Top up berhasil');
         } catch (error) {
             return errorResponse(
                 res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error && error.message ? error.message : 'Terjadi kesalahan',
+                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }

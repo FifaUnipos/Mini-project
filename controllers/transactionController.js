@@ -9,6 +9,7 @@ const {
 } = require('../utils/respons');
 
 class TransactionController {
+            // handleError removed (reverting to original error handling)
         /**
          * Delete transaction by ID
          * DELETE /api/transactions/:id
@@ -20,8 +21,8 @@ class TransactionController {
             } catch (error) {
                 return errorResponse(
                     res,
-                    error.message,
-                    error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                    error && error.message ? error.message : 'Terjadi kesalahan',
+                    error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR
                 );
             }
         }
@@ -29,74 +30,76 @@ class TransactionController {
      * Create new transaction (purchase PPOB product)
      * POST /api/transactions
      */
-    async createTransaction(req, res) {
-        try {
-            const transaction = await transactionService.createTransaction(req.body);
-            return successResponse(
-                res, 
-                transaction, 
-                SUCCESS_MESSAGES.TRANSACTION_SUCCESS, 
-                HTTP_STATUS.CREATED
-            );
-        } catch (error) {
-            return errorResponse(
-                res,
-                error && error.message ? error.message : 'Terjadi kesalahan',
-                error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
-                error && error.details ? error.details : null
-            );
+        async createTransaction(req, res) {
+            try {
+                const transaction = await transactionService.createTransaction(req.body);
+                return successResponse(
+                    res, 
+                    transaction, 
+                    SUCCESS_MESSAGES.TRANSACTION_SUCCESS, 
+                    HTTP_STATUS.CREATED
+                );
+            } catch (error) {
+                return errorResponse(
+                    res,
+                    error && error.message ? error.message : 'Terjadi kesalahan',
+                    error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    error && error.details ? error.details : error,
+                    error
+                );
+            }
         }
-    }
 
     /**
      * Get all transactions with pagination and filters
      * GET /api/transactions
      */
-    async getTransactions(req, res) {
-        try {
-            const options = {
-                page: parseInt(req.query.page) || 1,
-                limit: parseInt(req.query.limit) || 10,
-                user_id: req.query.user_id ? parseInt(req.query.user_id) : null,
-                product_id: req.query.product_id ? parseInt(req.query.product_id) : null,
-                status: req.query.status || null,
-                start_date: req.query.start_date || null,
-                end_date: req.query.end_date || null
-            };
-            
-            const result = await transactionService.getTransactions(options);
-            
-            return paginatedResponse(
-                res, 
-                result.data, 
-                result.pagination, 
-                SUCCESS_MESSAGES.TRANSACTIONS_FETCHED
-            );
-        } catch (error) {
-            return errorResponse(
-                res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
-            );
+        async getTransactions(req, res) {
+            try {
+                const options = {
+                    page: parseInt(req.query.page) || 1,
+                    limit: parseInt(req.query.limit) || 10,
+                    user_id: req.query.user_id ? parseInt(req.query.user_id) : null,
+                    product_id: req.query.product_id ? parseInt(req.query.product_id) : null,
+                    status: req.query.status || null,
+                    start_date: req.query.start_date || null,
+                    end_date: req.query.end_date || null
+                };
+                
+                const result = await transactionService.getTransactions(options);
+                
+                return paginatedResponse(
+                    res, 
+                    result.data, 
+                    result.pagination, 
+                    SUCCESS_MESSAGES.TRANSACTIONS_FETCHED
+                );
+            } catch (error) {
+                return errorResponse(
+                    res, 
+                    error && error.message ? error.message : 'Terjadi kesalahan',
+                    error && error.status ? error.status : HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                    error && error.details ? error.details : error
+                );
+            }
         }
-    }
 
     /**
      * Get transaction by ID
      * GET /api/transactions/:id
      */
-    async getTransactionById(req, res) {
-        try {
-            const transaction = await transactionService.getTransactionById(parseInt(req.params.id));
-            return successResponse(res, transaction, SUCCESS_MESSAGES.TRANSACTION_FETCHED);
-        } catch (error) {
-            return errorResponse(
-                res, 
-                error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
-            );
+        async getTransactionById(req, res) {
+            try {
+                const transaction = await transactionService.getTransactionById(parseInt(req.params.id));
+                return successResponse(res, transaction, SUCCESS_MESSAGES.TRANSACTION_FETCHED);
+            } catch (error) {
+                return errorResponse(
+                    res, 
+                    error.message, 
+                    error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                );
+            }
         }
-    }
 
     /**
      * Get transaction by reference number
@@ -110,7 +113,8 @@ class TransactionController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -144,7 +148,8 @@ class TransactionController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -161,7 +166,8 @@ class TransactionController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
@@ -178,7 +184,8 @@ class TransactionController {
             return errorResponse(
                 res, 
                 error.message, 
-                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR
+                error.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+                error
             );
         }
     }
